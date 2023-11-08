@@ -1,6 +1,6 @@
 ---
 title: "Data Visualisation"
-author: ""
+author: "Jonathan Opoku Oti"
 format:
   html:
     embed-resources: true
@@ -46,10 +46,10 @@ library(rnaturalearth)
 7.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
  
-gapminder_2007 <- ___ |> 
-  ___(year == 2007) 
+gapminder_2007 <- gapminder |> 
+  filter(year == 2007) 
 ```
 
 ## Task 3: Summarize data for life expectancy by continent
@@ -73,13 +73,13 @@ gapminder_2007 <- ___ |>
 8.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
 
-gapminder_summary_2007 <- ___ |> 
-  group_by(___) |> 
+gapminder_summary_2007 <- gapminder_2007 |> 
+  group_by(continent) |> 
   summarise(
     count = n(),
-    lifeExp = median(___)
+    lifeExp = median(lifeExp)
   )
 ```
 
@@ -104,11 +104,11 @@ gapminder_summary_2007 <- ___ |>
 8.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
 
-gapminder_summary_continent_year <- gapminder ___ 
-  group_by(continent, ___) |> 
-  ___(lifeExp = median(lifeExp)) 
+gapminder_summary_continent_year <- gapminder |> 
+  group_by(continent, year) |> 
+  summarise(lifeExp = median(lifeExp)) 
 
 ```
 
@@ -143,7 +143,17 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 4.  Run the code contained in the code chunk and fix any errors.
 
-5.  What are the data types of the three variables used for aesthetic mappings?
+5.  What are the data types of the three variables used for aesthetic mappings? **Numerical and non-numerical**
+
+```{r}
+gapminder_2007 |>
+  ggplot(mapping = aes(x = continent,
+                       y = lifeExp,
+                       fill = continent)) + 
+  geom_boxplot(outlier.shape = NA)
+```
+
+The code for removing the outliers from the boxplot was found here: <https://stackoverflow.com/questions/5677885/ignore-outliers-in-ggplot2-boxplot>
 
 ## Task 7: Create a timeseries plot
 
@@ -156,6 +166,15 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 -   continent to color using the `color = continent` argument inside `aes()`
 
 3.  Run the code contained in the code chunk and fix any errors.
+
+    ```{r}
+    gapminder_summary_continent_year |>
+      ggplot(mapping = aes(x = year,
+                           y = lifeExp,
+                           color = continent)) + 
+      geom_line() +
+      geom_point()
+    ```
 
 ## Task 8: Create a barplot
 
@@ -170,6 +189,13 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 3.  Run the code contained in the code chunk and fix any errors.
 
+    ```{r}
+    gapminder_summary_2007 |>
+      ggplot(mapping = aes(x = continent,
+                           y = count)) + 
+      geom_col()
+    ```
+
 ### with `geom_bar()`
 
 1.  Add a new code chunk below.
@@ -180,7 +206,13 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 3.  Run the code contained in the code chunk and fix any errors.
 
-4.  The plot is identical to the plot created with `geom_col()`. Why? What does the `geom_bar()` function do? Write your text here:
+4.  The plot is identical to the plot created with `geom_col()`. Why? What does the `geom_bar()` function do? Write your text here: **The two functions are for categorical data, however, geom_col() only works with defined x and y data coordinates where as the geom_bar() works with the raw data and automatically groups the data or counts the frequency once the categories are defined.**
+
+    ```{r}
+    gapminder_2007 |>
+      ggplot(mapping = aes(x = continent)) + 
+      geom_bar()
+    ```
 
 ## Task 9: Create a histogram
 
@@ -200,9 +232,16 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 5.  Run the code contained in the code chunk and fix any errors.
 
-6.  Describe how the `geom_histogram()` function is similar to the `geom_bar()` function.
+6.  Describe how the `geom_histogram()` function is similar to the `geom_bar()` function. **geom_histogram() is for representing coninuous data whiles the geom_bar is used for representing categorical data.**
 
-7.  What happens by adding the 'breaks' argument? Play around with the numbers inside of `seq()` to see what changes. Describe here what you observe:
+7.  What happens by adding the 'breaks' argument? Play around with the numbers inside of `seq()` to see what changes. Describe here what you observe: **The seq() function is for creating the bins for the histogram. The limits are 40 and 85 with interval of 2.5. Changing the values will alter the number of bins and the interval. This will also affect the chart as well.**
+
+    ```{r}
+    gapminder_2007 |>
+      ggplot(mapping = aes(x = lifeExp,
+                           fill = continent)) + 
+      geom_histogram(col = "grey30", breaks = seq(40, 85, 2.5))
+    ```
 
 ## Task 10: Scatterplot and faceting
 
@@ -221,6 +260,16 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 6.  Run the code contained in the code chunk and fix any errors.
 
+    ```{r}
+    gapminder_2007 |>
+      ggplot(mapping = aes(x = gdpPercap,
+                           y = lifeExp,
+                           color = continent,
+                           size = pop)) + 
+      geom_point() + 
+      facet_wrap(~continent)
+    ```
+
 ## Task 11: Create a lineplot and use facets
 
 1.  A code chunk with complete code has already been prepared.
@@ -236,7 +285,7 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 6.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
 
 ggplot(data = gapminder,
        mapping = aes(x = year, 
@@ -245,7 +294,7 @@ ggplot(data = gapminder,
                      color = country)) +
   geom_line(lwd = 1, show.legend = FALSE) + 
   facet_wrap(~continent) +
-  # scale_color_manual(values = country_colors) +
+  scale_color_manual(values = country_colors) +
   theme_minimal() 
 
 ```
@@ -263,7 +312,7 @@ The code chunk below contains code for a world map that shows countries by incom
 3.  Render the document and fix any errors.
 
 ```{r}
-#| eval: false
+#| eval: true
 
 world <- ne_countries(scale = "small", returnclass = "sf")
 
